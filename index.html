@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Redirector</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #1a237e;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #616161;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #3f51b5;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #303f9f;
+        }
+
+        #install-button {
+            margin-top: 15px;
+            background-color: #4caf50;
+            display: none;
+        }
+
+        #install-button:hover {
+            background-color: #43a047;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entrez l'adresse IP</h1>
+        <p>Veuillez saisir l'adresse IP pour continuer.</p>
+        
+        <form id="ipForm">
+            <div class="input-group">
+                <label for="ipAddress">Adresse IP :</label>
+                <input type="text" id="ipAddress" name="ipAddress" placeholder="Ex: 192.168.1.1" required>
+            </div>
+            
+            <button type="submit">Valider</button>
+            <button id="install-button">Installer sur le bureau</button>
+        </form>
+    </div>
+
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-button').style.display = 'block';
+        });
+
+        document.getElementById('install-button').addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Utilisateur a accepté d\'installer l\'application.');
+                    } else {
+                        console.log('Utilisateur a refusé d\'installer l\'application.');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        });
+
+        document.getElementById('ipForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const ipAddress = document.getElementById('ipAddress').value;
+            if (ipAddress) {
+                const url = ipAddress.startsWith('http://') || ipAddress.startsWith('https://')
+                    ? ipAddress
+                    : `http://${ipAddress}`;
+                window.location.href = url;
+            } else {
+                alert("Veuillez entrer une adresse IP valide.");
+            }
+        });
+    </script>
+</body>
+</html>
